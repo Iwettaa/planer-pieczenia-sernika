@@ -7,60 +7,80 @@
 <style>
 body {
     font-family: Arial, sans-serif;
-    background: #ffe6f0; /* pastelowy róż tło */
+    background: #ffe6f0;
     margin: 0;
     padding: 20px;
 }
+
 .container {
     max-width: 700px;
     margin: auto;
-    background: #fff0f6; /* jaśniejszy pastelowy róż */
+    background: #fff0f6;
     padding: 25px;
     border-radius: 16px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.1);
 }
+
 h1 { 
     text-align: center;
-    color: #d46ebf; /* ciemniejszy pastelowy róż dla nagłówka */
+    color: #d46ebf;
 }
+
 input, select, button {
-    padding: 10px;
-    margin: 5px 0;
-    border-radius: 8px;
+    padding: 12px;
+    margin: 6px 0;
+    border-radius: 10px;
     border: 1px solid #d46ebf;
     width: 100%;
     font-size: 16px;
+    box-sizing: border-box;
 }
+
 button {
-    background: #d46ebf; /* pastelowy róż przycisk */
+    background: #d46ebf;
     color: white;
     border: none;
     cursor: pointer;
+    font-size: 17px;
 }
+
 button:hover { 
-    background: #b347a1; /* ciemniejszy róż przy hover */
+    background: #b347a1;
 }
+
+/* Desktop */
 .stage {
     display: grid;
     grid-template-columns: 1fr 80px 120px 120px;
     gap: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 }
+
+/* 📱 MOBILE FIX */
+@media (max-width: 600px) {
+    .stage {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
 .result {
-    margin-top: 20px;
-    padding: 15px;
-    background: #ffe6f0; /* pastelowy róż dla wyników */
-    border-radius: 10px;
+    margin-top: 25px;
+    padding: 18px;
+    background: #ffe6f0;
+    border-radius: 12px;
 }
+
 .big-time {
-    font-size: 22px;
+    font-size: 24px;
     font-weight: bold;
-    margin-top: 10px;
+    margin-top: 15px;
     color: #d46ebf;
 }
+
 span.start-time {
     font-weight: bold;
-    font-size: 18px;
+    font-size: 19px;
     color: #d46ebf;
 }
 </style>
