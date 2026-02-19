@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Planer Pieczenia</title>
+
 <style>
 body {
     font-family: Arial, sans-serif;
@@ -48,7 +49,6 @@ button:hover {
     background: #b347a1;
 }
 
-/* Desktop */
 .stage {
     display: grid;
     grid-template-columns: 1fr 80px 120px 120px;
@@ -56,7 +56,6 @@ button:hover {
     margin-bottom: 12px;
 }
 
-/* 📱 MOBILE FIX */
 @media (max-width: 600px) {
     .stage {
         display: flex;
@@ -83,110 +82,155 @@ span.start-time {
     font-size: 19px;
     color: #d46ebf;
 }
+
+/* 🔽 Toggle button */
+.toggle {
+    background: #f7c1e3;
+    color: #a03c86;
+    font-weight: bold;
+}
+
+.hidden {
+    display: none;
+}
 </style>
 </head>
-<body>
 
+<body>
 <div class="container">
 <h1>🍰 Planer Pieczenia</h1>
 
 <label>Godzina włożenia:</label>
-<input type="time" id="startTime" value="19:51">
+<input type="time" id="startTime">
+
+<button class="toggle" onclick="toggleStages()">
+    ▼ Pokaż etapy
+</button>
+
+<div id="stagesContainer" class="hidden">
 
 <h3>Etapy:</h3>
-<div id="stages"></div>
 
-<button onclick="addStage()">+ Dodaj etap</button>
+<div id="stages">
+<div class="stage">
+<input type="text" value="Etap 1">
+<input type="number" value="20">
+<select>
+<option>Góra-dół</option>
+<option>Sam dół</option>
+</select>
+<select>
+<option>Bez przykrycia</option>
+<option>Z przykryciem</option>
+</select>
+</div>
+
+<div class="stage">
+<input type="text" value="Etap 2">
+<input type="number" value="15">
+<select>
+<option>Sam dół</option>
+<option>Góra-dół</option>
+</select>
+<select>
+<option>Z przykryciem</option>
+<option>Bez przykrycia</option>
+</select>
+</div>
+
+<div class="stage">
+<input type="text" value="Etap 3">
+<input type="number" value="10">
+<select>
+<option>Sam dół</option>
+<option>Góra-dół</option>
+</select>
+<select>
+<option>Bez przykrycia</option>
+<option>Z przykryciem</option>
+</select>
+</div>
+
+<div class="stage">
+<input type="text" value="Etap 4">
+<input type="number" value="5">
+<select>
+<option>Góra-dół</option>
+<option>Sam dół</option>
+</select>
+<select>
+<option>Bez przykrycia</option>
+<option>Z przykryciem</option>
+</select>
+</div>
+
+</div>
+</div>
+
 <button onclick="calculate()">Oblicz harmonogram</button>
 
-<div class="result" id="result"></div>
+<div id="result" class="result"></div>
+
 </div>
 
 <script>
-// Funkcja dodająca etap z wartościami
-function addStage(name="", duration="", mode="Góra-dół", cover="Bez przykrycia") {
-    const container = document.getElementById("stages");
-    const div = document.createElement("div");
-    div.className = "stage";
-    div.innerHTML = `
-        <input type="text" placeholder="Nazwa etapu" value="${name}">
-        <input type="number" placeholder="Min" min="1" value="${duration}">
-        <select>
-            <option ${mode==="Góra-dół" ? "selected":""}>Góra-dół</option>
-            <option ${mode==="Sam dół" ? "selected":""}>Sam dół</option>
-            <option ${mode==="Termoobieg" ? "selected":""}>Termoobieg</option>
-        </select>
-        <select>
-            <option ${cover==="Bez przykrycia" ? "selected":""}>Bez przykrycia</option>
-            <option ${cover==="Z przykryciem" ? "selected":""}>Z przykryciem</option>
-        </select>
-    `;
-    container.appendChild(div);
+
+function toggleStages() {
+    const container = document.getElementById("stagesContainer");
+    const button = document.querySelector(".toggle");
+
+    container.classList.toggle("hidden");
+
+    if (container.classList.contains("hidden")) {
+        button.innerHTML = "▼ Pokaż etapy";
+    } else {
+        button.innerHTML = "▲ Ukryj etapy";
+    }
 }
 
-// Ładowanie domyślnych etapów jak w Excelu
-function loadDefaultStages() {
-    addStage("Etap 1", 20, "Góra-dół", "Bez przykrycia");
-    addStage("Etap 2", 15, "Sam dół", "Z przykryciem");
-    addStage("Etap 3", 10, "Sam dół", "Bez przykrycia");
-    addStage("Etap 4", 5, "Góra-dół", "Bez przykrycia");
-}
-
-// Funkcja licząca harmonogram
 function calculate() {
     const startInput = document.getElementById("startTime").value;
-    if (!startInput) {
-        alert("Podaj godzinę startu!");
-        return;
-    }
+    if (!startInput) return;
 
     const stages = document.querySelectorAll(".stage");
     let [hours, minutes] = startInput.split(":").map(Number);
-    let currentTime = hours * 60 + minutes;
 
-    let output = "<h3>Harmonogram:</h3>";
+    let currentTime = new Date();
+    currentTime.setHours(hours);
+    currentTime.setMinutes(minutes);
+
+    let resultHTML = "<h3>Harmonogram:</h3>";
 
     stages.forEach(stage => {
-        const name = stage.children[0].value || "Etap";
+        const name = stage.children[0].value;
         const duration = parseInt(stage.children[1].value);
         const mode = stage.children[2].value;
         const cover = stage.children[3].value;
 
-        if (!duration) return;
+        let start = new Date(currentTime);
+        currentTime.setMinutes(currentTime.getMinutes() + duration);
+        let end = new Date(currentTime);
 
-        let startH = Math.floor(currentTime / 60);
-        let startM = currentTime % 60;
-
-        currentTime += duration;
-
-        let endH = Math.floor(currentTime / 60);
-        let endM = currentTime % 60;
-
-        output += `
+        resultHTML += `
+        <div class="big-time">
+            ${name}
+        </div>
         <div>
-        <strong>${name}</strong><br>
-        Rozpocznij: <span class="start-time">${formatTime(startH,startM)}</span> → Zakończ: ${formatTime(endH,endM)}<br>
-        ${mode}, ${cover}
-        </div><br>`;
+            Rozpocznij: <span class="start-time">${formatTime(start)}</span> → 
+            Zakończ: ${formatTime(end)}<br>
+            ${mode} | ${cover}
+        </div>
+        <hr>
+        `;
     });
 
-    let finalH = Math.floor(currentTime / 60);
-    let finalM = currentTime % 60;
-
-    output += `<div class="big-time">Wyłącz piekarnik o: ${formatTime(finalH,finalM)}</div>`;
-
-    document.getElementById("result").innerHTML = output;
+    document.getElementById("result").innerHTML = resultHTML;
 }
 
-// Formatuje godzinę w hh:mm
-function formatTime(h,m) {
-    h = h % 24;
-    return `${h.toString().padStart(2,"0")}:${m.toString().padStart(2,"0")}`;
+function formatTime(date) {
+    return date.toTimeString().slice(0,5);
 }
 
-// Załaduj domyślne etapy przy starcie
-loadDefaultStages();
 </script>
-
 </body>
 </html>
