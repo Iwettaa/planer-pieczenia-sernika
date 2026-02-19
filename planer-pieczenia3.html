@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planer Pieczenia</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #ffe6f0; /* pastelowy róż tło */
+    margin: 0;
+    padding: 20px;
+}
+.container {
+    max-width: 700px;
+    margin: auto;
+    background: #fff0f6; /* jaśniejszy pastelowy róż */
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+h1 { 
+    text-align: center;
+    color: #d46ebf; /* ciemniejszy pastelowy róż dla nagłówka */
+}
+input, select, button {
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 8px;
+    border: 1px solid #d46ebf;
+    width: 100%;
+    font-size: 16px;
+}
+button {
+    background: #d46ebf; /* pastelowy róż przycisk */
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+button:hover { 
+    background: #b347a1; /* ciemniejszy róż przy hover */
+}
+.stage {
+    display: grid;
+    grid-template-columns: 1fr 80px 120px 120px;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.result {
+    margin-top: 20px;
+    padding: 15px;
+    background: #ffe6f0; /* pastelowy róż dla wyników */
+    border-radius: 10px;
+}
+.big-time {
+    font-size: 22px;
+    font-weight: bold;
+    margin-top: 10px;
+    color: #d46ebf;
+}
+span.start-time {
+    font-weight: bold;
+    font-size: 18px;
+    color: #d46ebf;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1>🍰 Planer Pieczenia</h1>
+
+<label>Godzina włożenia:</label>
+<input type="time" id="startTime" value="19:51">
+
+<h3>Etapy:</h3>
+<div id="stages"></div>
+
+<button onclick="addStage()">+ Dodaj etap</button>
+<button onclick="calculate()">Oblicz harmonogram</button>
+
+<div class="result" id="result"></div>
+</div>
+
+<script>
+// Funkcja dodająca etap z wartościami
+function addStage(name="", duration="", mode="Góra-dół", cover="Bez przykrycia") {
+    const container = document.getElementById("stages");
+    const div = document.createElement("div");
+    div.className = "stage";
+    div.innerHTML = `
+        <input type="text" placeholder="Nazwa etapu" value="${name}">
+        <input type="number" placeholder="Min" min="1" value="${duration}">
+        <select>
+            <option ${mode==="Góra-dół" ? "selected":""}>Góra-dół</option>
+            <option ${mode==="Sam dół" ? "selected":""}>Sam dół</option>
+            <option ${mode==="Termoobieg" ? "selected":""}>Termoobieg</option>
+        </select>
+        <select>
+            <option ${cover==="Bez przykrycia" ? "selected":""}>Bez przykrycia</option>
+            <option ${cover==="Z przykryciem" ? "selected":""}>Z przykryciem</option>
+        </select>
+    `;
+    container.appendChild(div);
+}
+
+// Ładowanie domyślnych etapów jak w Excelu
+function loadDefaultStages() {
+    addStage("Etap 1", 20, "Góra-dół", "Bez przykrycia");
+    addStage("Etap 2", 15, "Sam dół", "Z przykryciem");
+    addStage("Etap 3", 10, "Sam dół", "Bez przykrycia");
+    addStage("Etap 4", 5, "Góra-dół", "Bez przykrycia");
+}
+
+// Funkcja licząca harmonogram
+function calculate() {
+    const startInput = document.getElementById("startTime").value;
+    if (!startInput) {
+        alert("Podaj godzinę startu!");
+        return;
+    }
+
+    const stages = document.querySelectorAll(".stage");
+    let [hours, minutes] = startInput.split(":").map(Number);
+    let currentTime = hours * 60 + minutes;
+
+    let output = "<h3>Harmonogram:</h3>";
+
+    stages.forEach(stage => {
+        const name = stage.children[0].value || "Etap";
+        const duration = parseInt(stage.children[1].value);
+        const mode = stage.children[2].value;
+        const cover = stage.children[3].value;
+
+        if (!duration) return;
+
+        let startH = Math.floor(currentTime / 60);
+        let startM = currentTime % 60;
+
+        currentTime += duration;
+
+        let endH = Math.floor(currentTime / 60);
+        let endM = currentTime % 60;
+
+        output += `
+        <div>
+        <strong>${name}</strong><br>
+        Rozpocznij: <span class="start-time">${formatTime(startH,startM)}</span> → Zakończ: ${formatTime(endH,endM)}<br>
+        ${mode}, ${cover}
+        </div><br>`;
+    });
+
+    let finalH = Math.floor(currentTime / 60);
+    let finalM = currentTime % 60;
+
+    output += `<div class="big-time">Wyłącz piekarnik o: ${formatTime(finalH,finalM)}</div>`;
+
+    document.getElementById("result").innerHTML = output;
+}
+
+// Formatuje godzinę w hh:mm
+function formatTime(h,m) {
+    h = h % 24;
+    return `${h.toString().padStart(2,"0")}:${m.toString().padStart(2,"0")}`;
+}
+
+// Załaduj domyślne etapy przy starcie
+loadDefaultStages();
+</script>
+
+</body>
+</html>
