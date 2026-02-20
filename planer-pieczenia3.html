@@ -6,15 +6,17 @@
 <title>Planer Pieczenia Sernika</title>
 
 <style>
+* {
+  box-sizing: border-box;
+}
+
 body {
     font-family: Arial, sans-serif;
     background: #ffe6f0;
     margin: 0;
     padding: 20px;
 }
-* {
-  box-sizing: border-box;
-}
+
 .container {
     max-width: 700px;
     margin: auto;
@@ -36,7 +38,6 @@ input, select, button {
     border: 1px solid #d46ebf;
     width: 100%;
     font-size: 16px;
-    box-sizing: border-box;
 }
 
 button {
@@ -53,7 +54,7 @@ button:hover {
 
 .stage {
     display: grid;
-    grid-template-columns: 1fr 80px 120px 120px;
+    grid-template-columns: 1fr 100px 120px 120px;
     gap: 10px;
     margin-bottom: 12px;
 }
@@ -85,7 +86,7 @@ span.start-time {
     color: #d46ebf;
 }
 
-/* 🔽 Toggle button */
+/* Toggle */
 .toggle {
     background: #f7c1e3;
     color: #a03c86;
@@ -95,11 +96,11 @@ span.start-time {
 .hidden {
     display: none;
 }
-    
+
+/* Start time styling */
 #startTime {
   display: block;
   width: 100%;
-  max-width: 100%;
   padding: 16px;
   border-radius: 18px;
   border: 2px solid #d48ac2;
@@ -113,7 +114,25 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   margin: 0;
 }
 
+/* Input with unit */
+.input-with-unit {
+    position: relative;
+    width: 100%;
+}
 
+.input-with-unit input {
+    padding-right: 45px;
+}
+
+.input-with-unit .unit {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: 600;
+    color: #a03c86;
+    pointer-events: none;
+}
 </style>
 </head>
 
@@ -133,9 +152,13 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 <h3>Etapy:</h3>
 
 <div id="stages">
+
 <div class="stage">
 <input type="text" value="Etap 1">
-<input type="number" value="20">
+<div class="input-with-unit">
+    <input type="number" value="20">
+    <span class="unit">min</span>
+</div>
 <select>
 <option>Góra-dół</option>
 <option>Sam dół</option>
@@ -148,7 +171,10 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 
 <div class="stage">
 <input type="text" value="Etap 2">
-<input type="number" value="15">
+<div class="input-with-unit">
+    <input type="number" value="15">
+    <span class="unit">min</span>
+</div>
 <select>
 <option>Sam dół</option>
 <option>Góra-dół</option>
@@ -161,7 +187,10 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 
 <div class="stage">
 <input type="text" value="Etap 3">
-<input type="number" value="10">
+<div class="input-with-unit">
+    <input type="number" value="10">
+    <span class="unit">min</span>
+</div>
 <select>
 <option>Sam dół</option>
 <option>Góra-dół</option>
@@ -174,7 +203,10 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 
 <div class="stage">
 <input type="text" value="Etap 4">
-<input type="number" value="5">
+<div class="input-with-unit">
+    <input type="number" value="5">
+    <span class="unit">min</span>
+</div>
 <select>
 <option>Góra-dół</option>
 <option>Sam dół</option>
@@ -223,19 +255,18 @@ function calculate() {
     let resultHTML = "<h3>Harmonogram:</h3>";
 
     stages.forEach(stage => {
-        const name = stage.children[0].value;
-        const duration = parseInt(stage.children[1].value);
-        const mode = stage.children[2].value;
-        const cover = stage.children[3].value;
+        const name = stage.querySelector("input[type='text']").value;
+        const duration = parseInt(stage.querySelector("input[type='number']").value);
+        const selects = stage.querySelectorAll("select");
+        const mode = selects[0].value;
+        const cover = selects[1].value;
 
         let start = new Date(currentTime);
         currentTime.setMinutes(currentTime.getMinutes() + duration);
         let end = new Date(currentTime);
 
         resultHTML += `
-        <div class="big-time">
-            ${name}
-        </div>
+        <div class="big-time">${name}</div>
         <div>
             Rozpocznij: <span class="start-time">${formatTime(start)}</span> → 
             Zakończ: ${formatTime(end)}<br>
