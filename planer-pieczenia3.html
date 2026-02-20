@@ -86,6 +86,28 @@ span.start-time {
     color: #d46ebf;
 }
 
+/* KONIEC block */
+.final-block {
+    margin-top: 25px;
+    padding: 20px;
+    background: #ffd6eb;
+    border-radius: 14px;
+    text-align: center;
+}
+
+.final-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #a03c86;
+}
+
+.final-time {
+    font-size: 32px;
+    font-weight: bold;
+    color: #d46ebf;
+    margin-top: 8px;
+}
+
 /* Toggle */
 .toggle {
     background: #f7c1e3;
@@ -148,7 +170,6 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 </button>
 
 <div id="stagesContainer" class="hidden">
-
 <h3>Etapy:</h3>
 
 <div id="stages">
@@ -156,8 +177,8 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 <div class="stage">
 <input type="text" value="Etap 1">
 <div class="input-with-unit">
-    <input type="number" value="20">
-    <span class="unit">min</span>
+<input type="number" value="20">
+<span class="unit">min</span>
 </div>
 <select>
 <option>Góra-dół</option>
@@ -172,8 +193,8 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 <div class="stage">
 <input type="text" value="Etap 2">
 <div class="input-with-unit">
-    <input type="number" value="15">
-    <span class="unit">min</span>
+<input type="number" value="15">
+<span class="unit">min</span>
 </div>
 <select>
 <option>Sam dół</option>
@@ -188,8 +209,8 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 <div class="stage">
 <input type="text" value="Etap 3">
 <div class="input-with-unit">
-    <input type="number" value="10">
-    <span class="unit">min</span>
+<input type="number" value="10">
+<span class="unit">min</span>
 </div>
 <select>
 <option>Sam dół</option>
@@ -204,8 +225,8 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 <div class="stage">
 <input type="text" value="Etap 4">
 <div class="input-with-unit">
-    <input type="number" value="5">
-    <span class="unit">min</span>
+<input type="number" value="5">
+<span class="unit">min</span>
 </div>
 <select>
 <option>Góra-dół</option>
@@ -253,6 +274,7 @@ function calculate() {
     currentTime.setMinutes(minutes);
 
     let resultHTML = "<h3>Harmonogram:</h3>";
+    let finalEndTime;
 
     stages.forEach(stage => {
         const name = stage.querySelector("input[type='text']").value;
@@ -265,6 +287,8 @@ function calculate() {
         currentTime.setMinutes(currentTime.getMinutes() + duration);
         let end = new Date(currentTime);
 
+        finalEndTime = new Date(end);
+
         resultHTML += `
         <div class="big-time">${name}</div>
         <div>
@@ -275,6 +299,13 @@ function calculate() {
         <hr>
         `;
     });
+
+    resultHTML += `
+        <div class="final-block">
+            <div class="final-title">KONIEC</div>
+            <div class="final-time">${formatTime(finalEndTime)}</div>
+        </div>
+    `;
 
     document.getElementById("result").innerHTML = resultHTML;
 }
